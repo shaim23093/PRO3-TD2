@@ -9,10 +9,10 @@ create table "dish" (
                         dish_type Dish_type not null
 );
 
-create table "ingredient" (
-                              id serial not null primary key,
-                              name varchar(255) not null,
-                              price numeric(10,2) not null,
-                              category ingredient_category not null,
-                              id_dish int references "dish"(id)
-);
+    create table "ingredient" (
+                                  id serial not null primary key,
+                                  name varchar(255) not null,
+                                  price numeric(10,2) not null,
+                                  category ingredient_category not null,
+                                  id_dish int references "dish"(id)
+    );

@@ -19,3 +19,18 @@ select setval(pg_get_serial_sequence('dish', 'id'),
 
 select setval(pg_get_serial_sequence('ingredient', 'id'),
               (select max(id) from "ingredient"));
+
+ALTER TABLE "ingredient"
+ADD COLUMN IF NOT EXISTS required_quantity DOUBLE PRECISION;
+
+UPDATE "ingredient"
+SET required_quantity = 1
+WHERE name = 'Laitue';
+
+UPDATE "ingredient"
+SET required_quantity = 2
+WHERE name = 'Tomate';
+
+UPDATE "ingredient"
+SET required_quantity = 0.5
+WHERE name = 'Poulet';

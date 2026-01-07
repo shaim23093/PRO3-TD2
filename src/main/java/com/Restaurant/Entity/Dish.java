@@ -66,12 +66,12 @@ public class Dish {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Dish dish = (Dish) o;
-        return id == dish.id && Double.compare(price, dish.price) == 0 && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(ingredient, dish.ingredient);
+        return id == dish.id && Double.compare(price, dish.price) == 0 && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(ingredients, dish.ingredients);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, dishType, ingredient);
+        return Objects.hash(id, name, price, dishType, ingredients);
     }
 
     @Override
@@ -84,11 +84,12 @@ public class Dish {
                 ", ingredient=" + ingredients +
                 '}';
     }
-    public Double getDishPrice() {
-        return ingredients.stream();
-
-
+    public Double getDishCost() {
+        return ingredients.stream()
+                .mapToDouble(Ingredient::getPrice)
+                .sum();
     }
+
 
     public  List<Ingredient> getIngredients() {
         return List.of(ingredients.toArray(new Ingredient[0]));
