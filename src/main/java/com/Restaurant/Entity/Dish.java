@@ -10,7 +10,7 @@ public class Dish {
     private DishTypeEnum dishType;
     private List<Ingredient> ingredient;
 
-    public Dish(int id, String name, double price, DishTypeEnum dishType, List<Ingredient> ingredient) {
+    public Dish(int id, String name, DishTypeEnum dishType, List<Ingredient> ingredient) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -84,5 +84,9 @@ public class Dish {
         return ingredient.stream();
 
 
+    }
+
+    public Ingredient[] getIngredients() {
+        return ingredient.toArray(new Ingredient[0]);
     }
 }
