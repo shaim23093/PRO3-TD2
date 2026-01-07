@@ -8,14 +8,18 @@ public class Dish {
     private String name;
     private double price;
     private DishTypeEnum dishType;
-    private List<Ingredient> ingredient;
+    private List<Ingredient> ingredients;
 
     public Dish(int id, String name, DishTypeEnum dishType, List<Ingredient> ingredient) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.dishType = dishType;
-        this.ingredient = ingredient;
+        this.ingredients = ingredient;
+    }
+
+    public Dish() {
+
     }
 
     public int getId() {
@@ -51,11 +55,11 @@ public class Dish {
     }
 
     public List<Ingredient> getIngredient() {
-        return ingredient;
+        return ingredients;
     }
 
     public void setIngredient(List<Ingredient> ingredient) {
-        this.ingredient = ingredient;
+        this.ingredients = ingredient;
     }
 
     @Override
@@ -77,16 +81,16 @@ public class Dish {
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", dishType=" + dishType +
-                ", ingredient=" + ingredient +
+                ", ingredient=" + ingredients +
                 '}';
     }
     public Double getDishPrice() {
-        return ingredient.stream();
+        return ingredients.stream();
 
 
     }
 
-    public Ingredient[] getIngredients() {
-        return ingredient.toArray(new Ingredient[0]);
+    public  List<Ingredient> getIngredients() {
+        return List.of(ingredients.toArray(new Ingredient[0]));
     }
 }

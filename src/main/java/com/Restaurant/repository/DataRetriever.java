@@ -164,15 +164,17 @@ public class DataRetriever {
 
                 String updateIngredientQuery = "UPDATE ingredient SET id = ?, name = ?, price = ?, category = ? WHERE id = ?";
                 PreparedStatement updateIngredientPreparedStmt = connection.prepareStatement(updateIngredientQuery);
-                for (Ingredient ingredient: dishToSave.getIngredients()) {
+                for (Ingredient ingredient : dishToSave.getIngredients()) {
                     updateIngredientPreparedStmt.setInt(1, ingredient.getId());
-                    updateDishPreparedStmt.setString(2, ingredient.getName());
+                    updateIngredientPreparedStmt.setString(2, ingredient.getName());
                     updateIngredientPreparedStmt.setDouble(3, ingredient.getPrice());
-                    updateDishPreparedStmt.setObject(4, ingredient.getCategory(), Types.OTHER);
+                    updateIngredientPreparedStmt.setObject(4, ingredient.getCategory(), Types.OTHER);
                     updateIngredientPreparedStmt.setInt(5, dishToSave.getId());
                 }
+
                 int affectedRows = updateDishPreparedStmt.executeUpdate();
-                return affectedRows > 0 ? "Dish avec les ingrédients mis à jour " + dishToSave.getIngredients().getFirst().getName() : "Aucun dish mis à jour";
+                return affectedRows > 0 ? "Dish avec les ingrédients mis à jour " + dishToSave.getIngredients().get(0).getName()
+                        : "Aucun dish mis à jour";
             }
 
             String insertDishQuery = "INSERT INTO dish(id, name, dish_type, ingredients) VALUES (?, ?, ?, ?)";

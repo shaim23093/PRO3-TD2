@@ -17,6 +17,10 @@ public class Ingredient {
         this.dish = dish;
     }
 
+    public Ingredient() {
+
+    }
+
     public int getId() {
         return id;
     }
