@@ -1,20 +1,18 @@
 \c mini_dish_db;
 
+create type Ingredient_category as enum ('VEGETABLE', 'ANIMAL', 'MARINE', 'DAIRY', 'OTHER');
+create type Dish_type as enum ('STARTER', 'MAIN', 'DESSERT');
 
-CREATE TABLE Dish (
-                      id INT PRIMARY KEY,
-                      name VARCHAR(100) NOT NULL,
-                      dish_type dish_type_enum enum {'START', 'MAIN', 'DESSERT'}NOT NULL
+create table "dish" (
+                        id serial not null primary key,
+                        name varchar(255) not null,
+                        dish_type Dish_type not null
 );
 
-CREATE TABLE Ingredient (
-                            id INT PRIMARY KEY,
-                            name VARCHAR(100) NOT NULL,
-                            price NUMERIC(10,2) NOT NULL,
-                            category ingredient_category enum {'VEGETABLE', 'ANIMAL', 'MARINE', 'DAIRY', 'OTHER'} NOT NULL,
-                            id_dish INT,
-                            CONSTRAINT fk_dish
-                                FOREIGN KEY (id_dish)
-                                    REFERENCES Dish(id)
-                                    ON DELETE SET NULL
+create table "ingredient" (
+                              id serial not null primary key,
+                              name varchar(255) not null,
+                              price numeric(10,2) not null,
+                              category ingredient_category not null,
+                              id_dish int references "dish"(id)
 );
