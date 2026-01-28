@@ -27,6 +27,129 @@ public class DataRetriever {
             throw new RuntimeException(e);
         }
     }
+    Order saveOrder(Order orderToSave) {
+        String insertOrderSql = """
+        INSERT INTO orders (id, customer_name, created_at)
+        VALUES (?, ?, now())
+        RETURNING id
+    """;
+
+        try (Connection conn = new DBConnection().getConnection()) {
+            conn.setAutoCommit(false);
+
+            // 1️⃣ Vérifier le stock AVANT tout
+            checkStockAvailability(conn, orderToSave);
+
+            Integer orderId;
+
+            // 2️⃣ Sauvegarder la commande
+            try (PreparedStatement ps = conn.prepareStatement(insertOrderSql)) {
+                ps.setInt(1, getNextSerialValue(conn, "orders", "id"));
+                ps.setString(2, orderToSave.getCustomerName());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    orderId = rs.getInt(1);
+                }
+            }
+
+            // 3️⃣ Sauvegarder les lignes de commande
+            attachOrderLines(conn, orderId, orderToSave);
+
+            // 4️⃣ Décrémenter le stock
+            updateStock(conn, orderToSave);
+
+            conn.commit();
+            return findOrderById(orderId);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void checkStockAvailability(Connection conn, Order order) throws SQLException {
+
+        String sql = """
+        SELECT i.id, i.name, i.stock_quantity, di.required_quantity
+        FROM dish_ingredient di
+        JOIN ingredient i ON i.id = di.id_ingredient
+        WHERE di.id_dish = ?
+    """;
+
+        for (OrderLine line : order.getOrderLines()) {
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, line.getDish().getId());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+
+                        String ingredientName = rs.getString("name");
+                        double stock = rs.getDouble("stock_quantity");
+                        double required = rs.getDouble("required_quantity");
+                        int dishCount = line.getQuantity();
+
+                        double needed = required * dishCount;
+
+                        if (stock < needed) {
+                            throw new RuntimeException(
+                                    "Stock insuffisant pour l'ingrédient : " + ingredientName
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private void updateStock(Connection conn, Order order) throws SQLException {
+
+        String updateSql = """
+        UPDATE ingredient
+        SET stock_quantity = stock_quantity - ?
+        WHERE id = ?
+    """;
+
+        try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+
+            for (OrderLine line : order.getOrderLines()) {
+
+                for (DishIngredient di : line.getDish().getDishIngredients()) {
+
+                    double usedQty = di.getQuantity() * line.getQuantity();
+
+                    ps.setDouble(1, usedQty);
+                    ps.setInt(2, di.getIngredient().getId());
+                    ps.addBatch();
+                }
+            }
+
+            ps.executeBatch();
+        }
+    }
+    private void updateStock(Connection conn, Order order) throws SQLException {
+
+        String updateSql = """
+        UPDATE ingredient
+        SET stock_quantity = stock_quantity - ?
+        WHERE id = ?
+    """;
+
+        try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+
+            for (OrderLine line : order.getOrderLines()) {
+
+                for (DishIngredient di : line.getDish().getDishIngredients()) {
+
+                    double usedQty = di.getQuantity() * line.getQuantity();
+
+                    ps.setDouble(1, usedQty);
+                    ps.setInt(2, di.getIngredient().getId());
+                    ps.addBatch();
+                }
+            }
+
+            ps.executeBatch();
+        }
+    }
 
     private List<DishOrder> findDishOrderByIdOrder(Integer idOrder) {
         DBConnection dbConnection = new DBConnection();
